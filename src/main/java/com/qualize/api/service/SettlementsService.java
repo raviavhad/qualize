@@ -9,6 +9,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Scanner;
+
 
 /**
  * Service Implementation for managing {@link Settlements}.
@@ -44,7 +50,9 @@ public class SettlementsService {
      */
     public Settlements update(Settlements settlements) {
         log.debug("Request to save Settlements : {}", settlements);
-        return settlementsRepository.save(settlements);
+        Settlements settlementResponse = settlementsRepository.save(settlements);
+        archieveToFilecoin();
+        return settlementResponse;
     }
 
     /**
@@ -125,4 +133,21 @@ public class SettlementsService {
         log.debug("Request to delete Settlements : {}", id);
         settlementsRepository.deleteById(id);
     }
+    
+    public void archieveToFilecoin() throws IOException {
+		URL url = new URL("https://api.web3.storage/upload");
+		HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
+		httpConn.setRequestMethod("POST");
+
+		httpConn.setRequestProperty("accept", "application/json");
+		httpConn.setRequestProperty("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDI3ZDMxYzdBOTJCNDA1QjcyQ2U4M2M5QkE5NjliMjkzMTQ0NGQxN2EiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2NTQxNTgyMjMyNDMsIm5hbWUiOiJ0ZXN0In0.3cKPOvjiHCfrwFQEvLnmkJkJhmpTlJHbprCtkt7E0pY");
+		httpConn.setRequestProperty("Content-Type", "multipart/form-data");
+
+		InputStream responseStream = httpConn.getResponseCode() / 100 == 2
+				? httpConn.getInputStream()
+				: httpConn.getErrorStream();
+		Scanner s = new Scanner(responseStream).useDelimiter("\\A");
+		String response = s.hasNext() ? s.next() : "";
+		System.out.println(response);
+	}
 }
