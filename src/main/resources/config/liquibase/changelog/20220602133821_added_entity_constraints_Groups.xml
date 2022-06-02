@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+    <!--
+        Added the constraints for entity Groups.
+    -->
+    <changeSet id="20220602133821-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="expenses_id"
+                                 baseTableName="jhi_groups"
+                                 constraintName="fk_jhi_groups__expenses_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="expenses"/>
+    </changeSet>
+</databaseChangeLog>

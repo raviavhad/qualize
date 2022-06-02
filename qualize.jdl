@@ -1,0 +1,126 @@
+
+//
+// An entity model for an online shop
+//
+
+application {
+  config {
+    baseName qualize
+    packageName com.qualize.api
+    authenticationType jwt
+    prodDatabaseType mysql
+    buildTool gradle
+    enableTranslation true
+    nativeLanguage en
+    languages [en, nl]
+  }
+  entities *
+}
+
+
+
+enum AccountStatus {
+    GREEN, RED, YELLOW
+}
+
+enum SettlementStatus {
+    COMPLETED, INPROGRESS, CANCELLED
+}
+
+enum ActivitiyStatus {
+    COMPLETED, INPROGRESS, CANCELLED
+}
+
+
+
+entity Expenses {
+    description String required,
+	paidBy BigDecimal,
+	amount BigDecimal,
+	cryptoCurrency String,
+    sortOrder Integer,
+    dateAdded LocalDate,
+    dateModified LocalDate
+
+}
+
+entity Friends {
+    friendName String,
+    email String,
+    telephone String,
+	phoneNumber Integer,
+	walletId String,
+	defaultCryptoCurrency String,
+    dateAdded LocalDate,
+    dateModified LocalDate
+ }
+
+entity Groups {
+    name String required,
+    sortOrder Integer,
+    dateAdded LocalDate,
+    dateModified LocalDate
+}
+
+entity Activities {
+    name String required,
+    date LocalDate,
+	type String,
+	sortOrder Integer,
+    dateAdded LocalDate,
+    dateModified LocalDate,
+    status ActivitiyStatus
+}
+
+entity Accounts {
+    amountYouOwe BigDecimal, 
+	amountFriendOwes BigDecimal, 
+	netReceivablePayable BigDecimal, 
+	cryptoCurrency String, 
+	currencyValue BigDecimal,
+	cryptoReceivablePayable BigDecimal,
+	sortOrder Integer,
+    dateAdded LocalDate,
+    dateModified LocalDate,
+    accountStatus AccountStatus	
+}
+
+entity CryptoTracker {
+    currency String required,
+    value BigDecimal,
+	feedDateTime LocalDate,
+    dateAdded LocalDate,
+    dateModified LocalDate
+}
+
+
+entity Settlements {
+    description String required,
+	amountYouOwe BigDecimal,
+	settlementStatus SettlementStatus,
+    cryptoCurrency String, 
+	currencyValue BigDecimal,
+	cryptoReceivablePayable BigDecimal,
+    sortOrder Integer,
+	transactionDate LocalDate,
+	dateModified LocalDate
+   
+}
+
+relationship OneToOne {
+    Groups{expenses} to Expenses{groupName},
+	Activities{expenseDetails} to Expenses{activities}
+	
+}
+
+relationship OneToMany {
+	Expenses{paidBy} to Friends{expense},
+	Settlements{account} to Friends{settlement},
+	Accounts{friendName} to Friends{accounts}
+   	
+}
+
+paginate Expenses, Friends, Groups, Activities, Accounts, CryptoTracker  with pagination
+paginate Settlements with infinite-scroll
+
+service Expenses, Friends, Groups, Activities, Accounts, CryptoTracker, Settlements  with serviceClass
